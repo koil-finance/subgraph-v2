@@ -1,12 +1,13 @@
 import { ZERO_BD, VAULT_ADDRESS, ZERO } from './helpers/constants';
 import { PoolType } from './helpers/pools';
 
-import { newPoolEntity, createPoolTokenEntity, scaleDown, getBalancerSnapshot, tokenToDecimal } from './helpers/misc';
+import { newPoolEntity, createPoolTokenEntity, scaleDown, getKoilSnapshot, tokenToDecimal } from './helpers/misc';
 import { updatePoolWeights } from './helpers/weighted';
 
 import { BigInt, Address, Bytes, BigDecimal } from '@graphprotocol/graph-ts';
 import { PoolCreated } from '../types/WeightedPoolFactory/WeightedPoolFactory';
-import { Balancer, Pool } from '../types/schema';
+import { Koil, Pool } from '../types/schema';
+// TODO change Balancer to Koil in schema
 
 // datasource
 import { WeightedPool as WeightedPoolTemplate } from '../types/templates';
@@ -229,12 +230,12 @@ function handleNewLinearPool(event: PoolCreated, poolType: string): void {
   LinearPoolTemplate.create(poolAddress);
 }
 
-function findOrInitializeVault(): Balancer {
-  let vault: Balancer | null = Balancer.load('2');
+function findOrInitializeVault(): Koil {
+  let vault: Koil | null = Koil.load('2');
   if (vault != null) return vault;
 
   // if no vault yet, set up blank initial
-  vault = new Balancer('2');
+  vault = new Koil('2');
   vault.poolCount = 0;
   vault.totalLiquidity = ZERO_BD;
   vault.totalSwapVolume = ZERO_BD;
@@ -273,7 +274,7 @@ function handleNewPool(event: PoolCreated, poolId: Bytes, swapFee: BigInt): Pool
     vault.poolCount += 1;
     vault.save();
 
-    let vaultSnapshot = getBalancerSnapshot(vault.id, event.block.timestamp.toI32());
+    let vaultSnapshot = getKoilSnapshot(vault.id, event.block.timestamp.toI32());
     vaultSnapshot.poolCount += 1;
     vaultSnapshot.save();
   }

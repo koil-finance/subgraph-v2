@@ -10,9 +10,10 @@ import {
   TokenSnapshot,
   TradePair,
   TradePairSnapshot,
-  BalancerSnapshot,
-  Balancer,
+  KoilSnapshot,
+  Koil,
 } from '../../types/schema';
+// TODO change BalancerSnapshot and Balancer to above in the types/schema
 import { ERC20 } from '../../types/Vault/ERC20';
 import { Swap as SwapEvent } from '../../types/Vault/Vault';
 import { ONE_BD, SWAP_IN, SWAP_OUT, ZERO, ZERO_BD } from './constants';
@@ -161,7 +162,7 @@ export function createPoolSnapshot(pool: Pool, timestamp: i32): void {
   let dayTimestamp = timestamp - (timestamp % DAY); // Todays Timestamp
 
   let poolId = pool.id;
-  if (pool == null || !pool.tokensList) return;
+  if (!pool.tokensList) return;
 
   let snapshotId = poolId + '-' + dayTimestamp.toString();
   let snapshot = PoolSnapshot.load(snapshotId);
@@ -338,16 +339,16 @@ export function getTradePairSnapshot(tradePairId: string, timestamp: i32): Trade
   return snapshot;
 }
 
-export function getBalancerSnapshot(vaultId: string, timestamp: i32): BalancerSnapshot {
+export function getKoilSnapshot(vaultId: string, timestamp: i32): KoilSnapshot {
   let dayID = timestamp / 86400;
   let id = vaultId + '-' + dayID.toString();
-  let snapshot = BalancerSnapshot.load(id);
+  let snapshot = KoilSnapshot.load(id);
 
   if (snapshot == null) {
     let dayStartTimestamp = dayID * 86400;
-    snapshot = new BalancerSnapshot(id);
+    snapshot = new KoilSnapshot(id);
     // we know that the vault should be created by this call
-    let vault = Balancer.load('2') as Balancer;
+    let vault = Koil.load('2') as Koil;
     snapshot.poolCount = vault.poolCount;
 
     snapshot.totalLiquidity = vault.totalLiquidity;

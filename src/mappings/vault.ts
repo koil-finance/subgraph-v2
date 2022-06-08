@@ -5,7 +5,8 @@ import {
   PoolBalanceManaged,
   InternalBalanceChanged,
 } from '../types/Vault/Vault';
-import { Balancer, Pool, Swap, JoinExit, Investment, TokenPrice, UserInternalBalance } from '../types/schema';
+import { Koil, Pool, Swap, JoinExit, Investment, TokenPrice, UserInternalBalance } from '../types/schema';
+// TODO change Balancer to Koil in schema
 import {
   tokenToDecimal,
   getTokenPriceId,
@@ -19,7 +20,7 @@ import {
   updateTokenBalances,
   getTradePairSnapshot,
   getTradePair,
-  getBalancerSnapshot,
+  getKoilSnapshot,
 } from './helpers/misc';
 import { updatePoolWeights } from './helpers/weighted';
 import {
@@ -371,13 +372,13 @@ export function handleSwapEvent(event: SwapEvent): void {
   pool.save();
 
   // update vault total swap volume
-  let vault = Balancer.load('2') as Balancer;
+  let vault = Koil.load('2') as Koil;
   vault.totalSwapVolume = vault.totalSwapVolume.plus(swapValueUSD);
   vault.totalSwapFee = vault.totalSwapFee.plus(swapFeesUSD);
   vault.totalSwapCount = vault.totalSwapCount.plus(BigInt.fromI32(1));
   vault.save();
 
-  let vaultSnapshot = getBalancerSnapshot(vault.id, blockTimestamp);
+  let vaultSnapshot = getKoilSnapshot(vault.id, blockTimestamp);
   vaultSnapshot.totalSwapVolume = vault.totalSwapVolume;
   vaultSnapshot.totalSwapFee = vault.totalSwapFee;
   vaultSnapshot.totalSwapCount = vault.totalSwapCount;
